@@ -23,7 +23,8 @@ while True:
         print("Select category by number")
         for idx, category in enumerate(categories):
             print(f"{idx + 1}. {category[0]}") #print an f string with index + 1 (removes 0 as first), for each categories
-        print(f"{len(categories + 1)}. Create a new category") # allows user to create a category if they dont have one that fits expense
+        
+        print(f"{len(categories) + 1}. Create a new category") # allows user to create a category if they dont have one that fits expense
 
         category_choice = int(input())
         if category_choice == len(categories) + 1:
@@ -33,7 +34,7 @@ while True:
 
         price = input("Enter the price of the expense: ")
 
-        cur.execute("INSERT INTO expenses (Date, description, category, price) VALUES (?, ?, ?, ?) (date, description, category, price)")
+        cur.execute("INSERT INTO expenses (Date, description, category, price) VALUES (?, ?, ?, ?)", (date, description, category, price))
 
         conn.commit() #commits changes
 
@@ -41,18 +42,19 @@ while True:
         print("Select an option")
         print("1. View all expenses")
         print("2. View monthly expenses by category")
-        view_choice == int(input())
+        view_choice = int(input())
         if view_choice == 1:
             cur.execute("SELECT * FROM expenses")
             expenses = cur.fetchall()
             for expense in expenses:
-                [rint(expense)]
+                print(expense)
         if view_choice == 2:
-            month = input("Enter the month (MM): ")
-            year = input("Enter the year (YYYY): ")
+            month = str(input("Enter the month (MM): "))
+            year = str(input("Enter the year (YYYY): "))
             cur.execute("""SELECT category, SUM(price) FROM expenses 
                         WHERE strftime('%m', Date) = ? AND strftime('%Y', Date) = ? 
                         GROUP BY category""", (month, year)) #selects a category and sums up the price column (total), where the month is equal to (input), and the year is equal to (input)
+            #cur.execute("""SELECT category, price FROM expenses WHERE Date = '29-08-1999'""")
             expenses = cur.fetchall()
             for expense in expenses:
                 print(f"Category: {expense[0]}, Total: {expense[1]}")
